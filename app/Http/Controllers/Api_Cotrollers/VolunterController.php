@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Api_models\Blind;
 use App\Models\Api_models\Volunteer;
 use App\Traits\GeneralTrait;
+use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -15,7 +16,7 @@ class VolunterController extends Controller
     use GeneralTrait;
     public function __construct()
     {
-        $this->middleware('auth:volunteer_api', ['except' => ['login','register']]);
+        $this->middleware('auth:volunteer_api', ['except' => ['login','register',]]);
 
     }
 
@@ -50,9 +51,12 @@ class VolunterController extends Controller
         {
             return $this->returnValidationError($validator);
         }
-        if(!$token=\auth()->attempt($validator->validated())){
-            return $this->returnError('Ei00',"unauthorized");
-        }
+        if(!$token=auth()->guard('volunteer_api')->attempt($validator->validated())){
+           return $this->returnError('Ei00',"unauthorized");
+       }
+//        $token=\auth()->attempt($validator->validated());
+
+
         return $this->creatnewToken($token);
     }
     public function creatnewToken($token){
@@ -61,7 +65,7 @@ class VolunterController extends Controller
             'Token_type'=>'bearer',
             "guard"=>$this->guard(),
             'expires_in' => $this->guard()->factory()->getTTL() * 60,
-            "USER"=>auth()->user(),
+            "USER"=>auth()->guard('volunteer_api')->user(),
 
         ],'login successfully');
     }

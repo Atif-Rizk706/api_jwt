@@ -20,6 +20,9 @@ class Blind extends Authenticatable implements JWTSubject
     public function calling(){
         return $this->hasMany(Calling::class);
     }
+    public function alarm(){
+        return $this->hasMany(Alarm::class);
+    }
 
     /**
      * The attributes that are mass assignable.
