@@ -30,7 +30,7 @@ Route::group(['namespace' => 'App\Http\Controllers', 'prefix' => 'blind'], funct
     Route::post('/logout',[BlindController::class,'logout']);
     Route::get('/profile',[BlindController::class,'blindProfile']);
     Route::post('/insertNum',[\App\Http\Controllers\Api_Cotrollers\CallingController::class,'addNumber']);
-    Route::get('/call/{name}',[\App\Http\Controllers\Api_Cotrollers\CallingController::class,'getNumber']);
+    Route::get('/calls',[\App\Http\Controllers\Api_Cotrollers\CallingController::class,'getallunm']);
 
 
 });
@@ -42,17 +42,19 @@ Route::group(['prefix' => 'Volunteer'], function ($router) {
 
     Route::post('/register', [\App\Http\Controllers\Api_Cotrollers\VolunterController::class,'register']);
     Route::post('/login',  [\App\Http\Controllers\Api_Cotrollers\VolunterController::class,'login']);
-
+    Route::post('/logout',  [\App\Http\Controllers\Api_Cotrollers\VolunterController::class,'logout']);
+    Route::get('/profile',  [\App\Http\Controllers\Api_Cotrollers\VolunterController::class,'volunterProfile']);
 
 });
 
 
 // api resources for alarm table for blind ?
 Route::group(['prefix'=>'blind'],function (){
-    Route::apiResource('/{blind}/alarms',AlarmController::class);
-    Route::get('/name',function (){
-        return response()->json("kkkkk");
-    });
-    Route::post('/storealarm',  [\App\Http\Controllers\Api_Cotrollers\AlarmController::class,'create']);
+
+    Route::post('/insertNum',[\App\Http\Controllers\Api_Cotrollers\CallingController::class,'addNumber']);
+    Route::get('/calls',[\App\Http\Controllers\Api_Cotrollers\CallingController::class,'getallunm']);
+    Route::delete('/{$name}',[\App\Http\Controllers\Api_Cotrollers\CallingController::class,'deleteNumber']);
+//    Route::get('/{$name}',[\App\Http\Controllers\Api_Cotrollers\CallingController::class,'deleteNumber']);
+
 });
 

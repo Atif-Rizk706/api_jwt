@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api_Cotrollers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Users\VolunteerResource;
 use App\Models\Api_models\Blind;
 use App\Models\Api_models\Volunteer;
 use App\Traits\GeneralTrait;
@@ -10,6 +11,7 @@ use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class VolunterController extends Controller
 {
@@ -24,7 +26,7 @@ class VolunterController extends Controller
     public function register(Request $request){
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|min:2|max:50',
-            'email' => 'required|email|string|unique:blinds|min:12|max:50',
+            'email' => 'required|email|string|unique:volunteers|min:12|max:50',
             'phone'=>'required|numeric|digits:11',
             'age'=>'required|numeric|digits:2',
             'national_id'=>'required|numeric|digits:14|unique:volunteers',
@@ -37,8 +39,13 @@ class VolunterController extends Controller
         }
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
-        $blind = Volunteer::create($input);
-        return $this->returnData('blind_data',$blind,"Registration successfully");
+        $volunteer = Volunteer::create($input);
+        $token = JWTAuth::fromUser($volunteer);
+        return $this->returnData('blind_data',
+            [  'token'=>$token,
+                'volunteer'=>new VolunteerResource($volunteer)
+            ],
+            "Registration successfully");
 
     }
     public function login(Request $request){
@@ -65,7 +72,7 @@ class VolunterController extends Controller
             'Token_type'=>'bearer',
             "guard"=>$this->guard(),
             'expires_in' => $this->guard()->factory()->getTTL() * 60,
-            "USER"=>auth()->guard('volunteer_api')->user(),
+            "USER"=>new VolunteerResource(auth()->guard('volunteer_api')->user()),
 
         ],'login successfully');
     }
@@ -75,7 +82,7 @@ class VolunterController extends Controller
     }
     public function volunterProfile(){
 
-        return $this->returnData("user_data",\auth()->user()," data for login user");
+        return $this->returnData("user_data",new VolunteerResource(auth()->user())," data for login user");
 
     }
 

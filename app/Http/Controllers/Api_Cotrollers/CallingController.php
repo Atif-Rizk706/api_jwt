@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api_Cotrollers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Users\CallingResource;
 use App\Models\Api_models\Calling;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
@@ -18,7 +19,7 @@ class CallingController extends Controller
       }
     public function addNumber(Request $request){
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:2',
+            'name' => 'required|string',
             'number'=>'required|numeric|digits:11',
 
         ]);
@@ -35,11 +36,22 @@ class CallingController extends Controller
 
 
     }
-    public function getNumber($name){
-        $number=Calling::where('name',$name)->where('user_id',Auth()->user()->id)->get('phone_number');
+    public function deleteNumber($name){
+        $number=Calling::where('name',$name)->where('user_id',Auth()->user()->id)->get();
         if($number==''){
             return $this->returnError('Eoo',"three is no number founded");
         }
-         return $this->returnData('phone num',$number,'phone selected successfully');
+        $number->delete();
+         return $this-> returnSuccessMessage('phone selected successfully');
+    }
+    public function getallunm(){
+        $number=Calling::where('user_id',Auth()->user()->id)->get();
+        if($number==''){
+            return $this->returnError('Eoo',"three is no number founded");
+        }
+        return $this->returnData('phone num',CallingResource::collection($number),'phones selected successfully');
+
+
+
     }
 }

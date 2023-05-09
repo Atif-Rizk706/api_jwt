@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAlarmsTable extends Migration
+class CreateVediosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,12 @@ class CreateAlarmsTable extends Migration
      */
     public function up()
     {
-        Schema::create('alarms', function (Blueprint $table) {
+        Schema::create('vedios', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable();
-            $table->text('content');
-            $table->date('alarm_date');
-            $table->time('alarm_time');
+            $table->integer("agora_id");
+            $table->text("channel");
+            $table->text("token");
+            $table->boolean("active")->default(false);
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ class CreateAlarmsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('alarms');
+        Schema::dropIfExists('vedios');
     }
 }

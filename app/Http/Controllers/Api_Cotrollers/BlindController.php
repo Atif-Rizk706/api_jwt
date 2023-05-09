@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api_Cotrollers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Users\BlindResource;
 use App\Models\Api_models\Blind;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Exception;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 
 class BlindController extends Controller
@@ -36,7 +38,13 @@ class BlindController extends Controller
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
         $blind = Blind::create($input);
-        return $this->returnData('blind_data',$blind,"Registration successfully");
+        $token = JWTAuth::fromUser($blind);
+
+        return $this->returnData('blind_data', [
+            'token' => $token,
+            'blind' => new BlindResource($blind),
+
+        ], "Registration successful");
     }
     public function login(Request $request){
         $rules = [
@@ -59,7 +67,7 @@ class BlindController extends Controller
             'Token_type'=>'bearer',
             "guard"=>$this->guard(),
             'expires_in' => $this->guard()->factory()->getTTL() * 60,
-            "USER"=>auth()->user(),
+            "USER"=>new BlindResource(auth()->user()),
 
         ],'login successfully');
     }
@@ -69,7 +77,7 @@ class BlindController extends Controller
     }
     public function blindProfile(){
 
-          return $this->returnData("user_data",\auth()->user()," data for login user");
+          return $this->returnData("user_data",new BlindResource(auth()->user())," data for login user");
 
     }
 
